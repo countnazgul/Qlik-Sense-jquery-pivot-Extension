@@ -1,4 +1,86 @@
-$(document).ready(function () {
+define(["jquery","./jquery.pivot.min","text!./stylesheet.css"], function($, cssContent) {'use strict';
+	$("<style>").html(cssContent).appendTo("head");
+	return {
+		initialProperties : {
+			version: 1.0,
+			qHyperCubeDef : {
+				qDimensions : [],
+				qMeasures : [],
+				qInitialDataFetch : [{
+					qWidth : 10,
+					qHeight : 50
+				}]
+			}
+		},
+		definition : {
+			type : "items",
+			component : "accordion",
+			items : {
+				dimensions : {
+					uses : "dimensions",
+					min : 1
+				},
+				measures : {
+					uses : "measures",
+					min : 1
+				},
+				sorting : {
+					uses : "sorting"
+				},
+				settings : {
+					uses : "settings",
+					items : {
+						initFetchRows : {
+							ref : "qHyperCubeDef.qInitialDataFetch.0.qHeight",
+							label : "Initial fetch rows",
+							type : "number",
+							defaultValue : 50
+						},
+						Pivot: {
+							type: "items",
+							label: "Pie Chart Options" ,
+							items: {
+						Title : {
+							ref: "PieTitle",
+							label: "Title",
+							type: "string",
+							defaultValue: "Pie Chart",
+						},
+						Size : {
+							ref: "PieSize",
+							label: "Size",
+							type: "integer",
+							defaultValue: 100,
+							component: "slider",
+							min: 1,
+							max: 100,
+							step: 1
+						},
+						InnerSize : {
+							ref: "PieInnerSize",
+							label: "Inner Size",
+							type: "integer",
+							defaultValue: 60,
+							component: "slider",
+							min: 1,
+							max: 100,
+							step: 1
+						}
+}
+}
+					}
+				}
+			}
+		},
+		snapshot : {
+			canTakeSnapshot : true
+		},
+		paint : function($element,layout) {
+			var qMatrix = layout.qHyperCube.qDataPages[0].qMatrix;
+			var colors = Highcharts.getOptions().colors;
+			var id = "div_" + layout.qInfo.qId;
+			$element.html( '<div id="' + id + '"></div>' );
+
 
   var example4JSONdata = {
       dataid: "An optional sourcetable identifier",
