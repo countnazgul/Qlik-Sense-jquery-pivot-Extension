@@ -1,4 +1,4 @@
-define(["jquery","./jquery.pivot.min","text!./stylesheet.css"], function($, cssContent) {'use strict';
+define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, cssContent) {'use strict';
 	$("<style>").html(cssContent).appendTo("head");
 	return {
 		initialProperties : {
@@ -18,7 +18,8 @@ define(["jquery","./jquery.pivot.min","text!./stylesheet.css"], function($, cssC
 			items : {
 				dimensions : {
 					uses : "dimensions",
-					min : 1
+					min : 1,
+					max: 2
 				},
 				measures : {
 					uses : "measures",
@@ -77,29 +78,36 @@ define(["jquery","./jquery.pivot.min","text!./stylesheet.css"], function($, cssC
 		},
 		paint : function($element,layout) {
 			var qMatrix = layout.qHyperCube.qDataPages[0].qMatrix;
-			var colors = Highcharts.getOptions().colors;
+			//var colors = Highcharts.getOptions().colors;
 			var id = "div_" + layout.qInfo.qId;
 			$element.html( '<div id="' + id + '"></div>' );
 
-
+      //console.log(qMatrix);
+      console.log(id);
+// { "Month ": "January", "Subject ": "English", "Student ": "Elisa", "Score ": "8.7" },
+//           { "Month ": "January ", "Subject ": "Maths ", "Student ": "Elisa ", "Score ": "6.5 " },
+//           { "Month ": "January ", "Subject ": "Science ", "Student ": "Elisa ", "Score ": "5.8 " },
+//           { "Month ": "March ", "Subject ": "History ", "Student ": "Mary ", "Score ": "6.7 " },
+//           { "Month ": "March ", "Subject ": "French ", "Student ": "Mary ", "Score ": "9.0 "}
   var example4JSONdata = {
       dataid: "An optional sourcetable identifier",
       columns: [
-          { colvalue: "Month ", coltext: "Month ", header: "Month ", sortbycol: "Month ", groupbyrank: null, pivot: true, result: false },
+          { colvalue: "Month "  , coltext: "Month "  , header: "Month "  , sortbycol: "Month "  , groupbyrank: null, pivot: true, result: false },
           { colvalue: "Subject ", coltext: "Subject ", header: "Subject ", sortbycol: "Subject ", groupbyrank: 2, pivot: false, result: false },
           { colvalue: "Student ", coltext: "Student ", header: "Student ", sortbycol: "Student ", dataid: "An optional id.", groupbyrank: 1, pivot: false, result: false },
-          { colvalue: "Score ", coltext: "Score ", header: "Score ", sortbycol: "Score ", groupbyrank: null, pivot: false, result: true}],
+          { colvalue: "Score "  , coltext: "Score "  , header: "Score "  , sortbycol: "Score "  , groupbyrank: null, pivot: false, result: true}],
       rows: [
-          { "Month ": "January", "Subject ": "English", "Student ": "Elisa", "Score ": "8.7" },
+{ "Month ": "January", "Subject ": "English", "Student ": "Elisa", "Score ": "8.7" },
           { "Month ": "January ", "Subject ": "Maths ", "Student ": "Elisa ", "Score ": "6.5 " },
           { "Month ": "January ", "Subject ": "Science ", "Student ": "Elisa ", "Score ": "5.8 " },
           { "Month ": "March ", "Subject ": "History ", "Student ": "Mary ", "Score ": "6.7 " },
-          { "Month ": "March ", "Subject ": "French ", "Student ": "Mary ", "Score ": "9.0 "}]
+          { "Month ": "March ", "Subject ": "French ", "Student ": "Mary ", "Score ": "9.0 "}
+          ]
   };
 
 
 
-    $('#res').pivot({
+    $('#'+id).pivot({
         source: example4JSONdata,
         //formatFunc: function (n) { return jQuery.fn.pivot.formatUK(n, 2); },
         onResultCellClicked: function (data) {
@@ -145,7 +153,7 @@ define(["jquery","./jquery.pivot.min","text!./stylesheet.css"], function($, cssC
             return obj;
         }
     }
-
+}};
 
 
 });

@@ -1,47 +1,43 @@
-body {font-family : Verdana;}
+.qv-object-${name} span.em { font-style:italic; text-decoration:underline;}
 
-pre {border:1px solid grey; background:#EFE4B0; padding:10px;}
+.qv-object-${name} {margin-top:20px}
 
-span.em { font-style:italic; text-decoration:underline;}
+.qv-object-${name} table.pivot ul {list-style-image:none; list-style-type:none; }
 
-#res, #res2 {margin-top:20px}
+.qv-object-${name} table.pivot {border-collapse : collapse;border : solid 1px black;text-align : right;}
 
-table.pivot ul {list-style-image:none; list-style-type:none; }
+.qv-object-${name} table.pivot td.resultcell, table.pivot .foldunfold{text-decoration : underline; cursor:pointer;  white-space:nowrap;}
 
-table.pivot {border-collapse : collapse;border : solid 1px black;text-align : right;}
+.qv-object-${name} table.pivot th, table.pivot td{padding :5px;}
 
-table.pivot td.resultcell, table.pivot .foldunfold{text-decoration : underline; cursor:pointer;  white-space:nowrap;}
+.qv-object-${name} table.pivot tr.head{font-size : larger;text-align : center;}
 
-table.pivot th, table.pivot td{padding :5px;}
+.qv-object-${name} table.pivot .total{background-color : #eee;  white-space:nowrap;}
 
-table.pivot tr.head{font-size : larger;text-align : center;}
+.qv-object-${name} table.pivot tr.total th{text-align : left;}
 
-table.pivot .total{background-color : #eee;  white-space:nowrap;}
+.qv-object-${name} table.pivot tr.total td, table.pivot tr.total th{border-top : solid 1px black;}
 
-table.pivot tr.total th{text-align : left;}
+.qv-object-${name} table.pivot td.total{border-left : solid 1px black;}
 
-table.pivot tr.total td, table.pivot tr.total th{border-top : solid 1px black;}
+.qv-object-${name} table.pivot td.total.total1{border-left : none;}
 
-table.pivot td.total{border-left : solid 1px black;}
+.qv-object-${name} table.pivot tr.head th.groupby{background-color : #ddd;}
 
-table.pivot td.total.total1{border-left : none;}
+.qv-object-${name} table.pivot tr.head th.pivotcol{background-color : #eee;font-size : smaller;border : solid 1px black;}
 
-table.pivot tr.head th.groupby{background-color : #ddd;}
+.qv-object-${name} table.pivot th.groupby{text-align:left;font-weight : normal;}
 
-table.pivot tr.head th.pivotcol{background-color : #eee;font-size : smaller;border : solid 1px black;}
-
-table.pivot th.groupby{text-align:left;font-weight : normal;}
-
-table.pivot .foldunfold
+.qv-object-${name} table.pivot .foldunfold
 {
     color : Black;
-	background-image : url('images/navigate_minus.png');
+	background-image : url('/extensions/com-jquery-pivot/images/navigate_minus.png');
 	background-repeat : no-repeat;
 	background-position:left;
 	padding-left:18px;
 }
 
-table.pivot .foldunfold.collapsed{background-image : url('images/navigate_plus.png');}
+.qv-object-${name} table.pivot .foldunfold.collapsed{background-image : url('/extensions/com-jquery-pivot/images/navigate_plus.png');}
 
 
 
