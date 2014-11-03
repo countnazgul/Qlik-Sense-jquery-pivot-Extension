@@ -1,6 +1,8 @@
 .qv-object-${name} span.em { font-style:italic; text-decoration:underline;}
 
-.qv-object-${name} {margin-top:20px}
+.qv-object-${name} div.qv-object-content-container {
+	overflow: auto;
+}
 
 .qv-object-${name} table.pivot ul {list-style-image:none; list-style-type:none; }
 

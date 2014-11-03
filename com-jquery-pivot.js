@@ -19,7 +19,7 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, css
 				dimensions : {
 					uses : "dimensions",
 					min : 1,
-					max: 2
+					max: 3
 				},
 				measures : {
 					uses : "measures",
@@ -35,40 +35,40 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, css
 							ref : "qHyperCubeDef.qInitialDataFetch.0.qHeight",
 							label : "Initial fetch rows",
 							type : "number",
-							defaultValue : 50
+							defaultValue : 1500
 						},
 						Pivot: {
 							type: "items",
 							label: "Pie Chart Options" ,
 							items: {
-						Title : {
-							ref: "PieTitle",
-							label: "Title",
-							type: "string",
-							defaultValue: "Pie Chart",
-						},
-						Size : {
-							ref: "PieSize",
-							label: "Size",
-							type: "integer",
-							defaultValue: 100,
-							component: "slider",
-							min: 1,
-							max: 100,
-							step: 1
-						},
-						InnerSize : {
-							ref: "PieInnerSize",
-							label: "Inner Size",
-							type: "integer",
-							defaultValue: 60,
-							component: "slider",
-							min: 1,
-							max: 100,
-							step: 1
-						}
-}
-}
+    						Title : {
+    							ref: "PieTitle",
+    							label: "Title",
+    							type: "string",
+    							defaultValue: "Pie Chart",
+    						},
+    						Size : {
+    							ref: "PieSize",
+    							label: "Size",
+    							type: "integer",
+    							defaultValue: 100,
+    							component: "slider",
+    							min: 1,
+    							max: 100,
+    							step: 1
+    						},
+    						InnerSize : {
+    							ref: "PieInnerSize",
+    							label: "Inner Size",
+    							type: "integer",
+    							defaultValue: 60,
+    							component: "slider",
+    							min: 1,
+    							max: 100,
+    							step: 1
+    						}
+              }
+            }
 					}
 				}
 			}
@@ -82,37 +82,56 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, css
 			var id = "div_" + layout.qInfo.qId;
 			$element.html( '<div id="' + id + '"></div>' );
 
-      //console.log(qMatrix);
-      console.log(id);
-// { "Month ": "January", "Subject ": "English", "Student ": "Elisa", "Score ": "8.7" },
-//           { "Month ": "January ", "Subject ": "Maths ", "Student ": "Elisa ", "Score ": "6.5 " },
-//           { "Month ": "January ", "Subject ": "Science ", "Student ": "Elisa ", "Score ": "5.8 " },
-//           { "Month ": "March ", "Subject ": "History ", "Student ": "Mary ", "Score ": "6.7 " },
-//           { "Month ": "March ", "Subject ": "French ", "Student ": "Mary ", "Score ": "9.0 "}
-  var example4JSONdata = {
-      dataid: "An optional sourcetable identifier",
-      columns: [
-          { colvalue: "Month "  , coltext: "Month "  , header: "Month "  , sortbycol: "Month "  , groupbyrank: null, pivot: true, result: false },
-          { colvalue: "Subject ", coltext: "Subject ", header: "Subject ", sortbycol: "Subject ", groupbyrank: 2, pivot: false, result: false },
-          { colvalue: "Student ", coltext: "Student ", header: "Student ", sortbycol: "Student ", dataid: "An optional id.", groupbyrank: 1, pivot: false, result: false },
-          { colvalue: "Score "  , coltext: "Score "  , header: "Score "  , sortbycol: "Score "  , groupbyrank: null, pivot: false, result: true}],
-      rows: [
-{ "Month ": "January", "Subject ": "English", "Student ": "Elisa", "Score ": "8.7" },
-          { "Month ": "January ", "Subject ": "Maths ", "Student ": "Elisa ", "Score ": "6.5 " },
-          { "Month ": "January ", "Subject ": "Science ", "Student ": "Elisa ", "Score ": "5.8 " },
-          { "Month ": "March ", "Subject ": "History ", "Student ": "Mary ", "Score ": "6.7 " },
-          { "Month ": "March ", "Subject ": "French ", "Student ": "Mary ", "Score ": "9.0 "}
-          ]
-  };
+      var d = 0;
+      var c = 0;
+      var columns = [];
+      var rows = [];
 
+      for(c = 0; c < layout.qHyperCube.qDimensionInfo.length; c++) {
+        var column = layout.qHyperCube.qDimensionInfo[c];
+        column = { colvalue: column.qFallbackTitle.replace(' ', ''), coltext: column.qFallbackTitle.replace(' ', ''), header: column.qFallbackTitle.replace(' ', ''), sortbycol: column.qFallbackTitle.replace(' ', ''), result: false };
+        if( c === 0) {
+          column.pivot = true;
+          column.groupbyrank = null;
+        } else {
+          column.pivot = false;
+          column.groupbyrank = c;
+        }
+        columns.push(column);
+      }
+      
+      var lastMeasure = {};
+      lastMeasure.colvalue = layout.qHyperCube.qMeasureInfo[0].qFallbackTitle.replace(' ', '');
+      lastMeasure.coltext = layout.qHyperCube.qMeasureInfo[0].qFallbackTitle.replace(' ', '');
+      lastMeasure.header = layout.qHyperCube.qMeasureInfo[0].qFallbackTitle.replace(' ', '');
+      lastMeasure.sortbycol = layout.qHyperCube.qMeasureInfo[0].qFallbackTitle.replace(' ', '');
+      lastMeasure.result = true;
+      lastMeasure.pivot = false;
+      lastMeasure.groupbyrank = null;
+      columns.push(lastMeasure);
+      
+      for(d = 0; d < qMatrix.length; d++) {
+          var row = qMatrix[d];
+          var row1 = {};
+          row1[columns[0].coltext] = row[0].qText.replace(' ', '');
+          row1[columns[1].coltext] = row[1].qText.replace(' ', '');
+          row1[layout.qHyperCube.qMeasureInfo[0].qFallbackTitle] = row[2].qText;
+          
+          row = { "Month ": row[0].qText, "Subject ": row[1].qText, "Score ": row[2].qText };
+          rows.push(row1);
+      }
 
+      var JSONdata = {
+          dataid: "An optional sourcetable identifier",
+          columns: columns,
+          rows: rows
+      };
 
     $('#'+id).pivot({
-        source: example4JSONdata,
+        source: JSONdata,
         //formatFunc: function (n) { return jQuery.fn.pivot.formatUK(n, 2); },
         onResultCellClicked: function (data) {
           var a = '{' + dumpObj(data, "data") + '}';
-
           console.log(JSON.parse(a));
         },
         sortPivotColumnHeaders:false //we want months non sorted to get them in the right order.
