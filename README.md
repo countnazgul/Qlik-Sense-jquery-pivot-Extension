@@ -18,4 +18,4 @@ What need to be added:
 * If possible to change Totals position - Top or Bottom
 * Dimension click - make selection by clicking on dimension value in the table (not provided by jquery.pivot api. need checking/implementing)
 
-![Screenshot](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Screenshot")
+![Screenshot](https://cloud.githubusercontent.com/assets/22850/4894534/b36f2350-63d4-11e4-8a6c-6ebb6f794d69.png "Screenshot")
