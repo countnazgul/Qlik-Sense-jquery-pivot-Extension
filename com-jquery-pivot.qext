@@ -1,9 +1,9 @@
 {
 	"name" : "Jquery Pivot",
 	"description" : "Pivot chart using jquery.pivot https://github.com/countnazgul/Qlik-Sense-jquery-pivot-Extension",
-	"icon" : "pie-chart",
+	"icon" : "table",
 	"type" : "visualization",
 	"version": "1.0",
-	"preview" : "pie",
+	"preview" : "table",
 	"author": "stefan.stoichev@gmail.com"
 }

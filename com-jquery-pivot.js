@@ -1,4 +1,4 @@
-define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, cssContent) {'use strict';
+define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], function($, cssContent) {'use strict';
 	$("<style>").html(cssContent).appendTo("head");
 	return {
 		initialProperties : {
@@ -39,33 +39,41 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, css
 						},
 						Pivot: {
 							type: "items",
-							label: "Pie Chart Options" ,
+							label: "jquery.pivot options" ,
 							items: {
-    						Title : {
-    							ref: "PieTitle",
-    							label: "Title",
+    						Format : {
+    							ref: "format",
+    							label: "Format (using http://numeraljs.com)",
     							type: "string",
-    							defaultValue: "Pie Chart",
+    							defaultValue: "0,0.00",
     						},
-    						Size : {
-    							ref: "PieSize",
-    							label: "Size",
-    							type: "integer",
-    							defaultValue: 100,
-    							component: "slider",
-    							min: 1,
-    							max: 100,
-    							step: 1
+    						Totals : {
+    							ref: "showtotals",
+    							label: "Show totals",
+    							type: "boolean",
+    							defaultValue: true,
+    							component: "switch",
+      						options: [ {
+      							value: true,
+      							label: "On"
+      						}, {
+      							value: false,
+      							label: "Off"
+      						} ],
     						},
-    						InnerSize : {
-    							ref: "PieInnerSize",
-    							label: "Inner Size",
-    							type: "integer",
-    							defaultValue: 60,
-    							component: "slider",
-    							min: 1,
-    							max: 100,
-    							step: 1
+    						Collapsible : {
+    							ref: "collapsible",
+    							label: "Collapsible",
+    							type: "boolean",
+    							defaultValue: true,
+    							component: "switch",
+      						options: [ {
+      							value: true,
+      							label: "On"
+      						}, {
+      							value: false,
+      							label: "Off"
+      						} ],
     						}
               }
             }
@@ -113,11 +121,11 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, css
       for(d = 0; d < qMatrix.length; d++) {
           var row = qMatrix[d];
           var row1 = {};
-          row1[columns[0].coltext] = row[0].qText.replace(' ', '');
-          row1[columns[1].coltext] = row[1].qText.replace(' ', '');
-          row1[layout.qHyperCube.qMeasureInfo[0].qFallbackTitle] = row[2].qText;
-          
-          row = { "Month ": row[0].qText, "Subject ": row[1].qText, "Score ": row[2].qText };
+          for(var co = 0; co < columns.length; co++) {
+            row1[columns[co].coltext] = row[co].qText.replace(' ', '');
+          }
+
+          row1[layout.qHyperCube.qMeasureInfo[0].qFallbackTitle] = row[row.length-1].qText;
           rows.push(row1);
       }
 
@@ -127,14 +135,19 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min"], function($, css
           rows: rows
       };
 
+      //var format = layout.format;
     $('#'+id).pivot({
         source: JSONdata,
-        //formatFunc: function (n) { return jQuery.fn.pivot.formatUK(n, 2); },
+        formatFunc: function (n) { return numeral(n).format(layout.format) }, //jQuery.fn.pivot.formatUK(n, parseInt(layout.decimals)); },
+        bTotals: layout.showtotals,              // Option
+        bCollapsible: layout.collapsible,         // Option
+        noGroupByText: "No value",  // Option
+        noDataText: "No data",      // Option
         onResultCellClicked: function (data) {
           var a = '{' + dumpObj(data, "data") + '}';
           console.log(JSON.parse(a));
         },
-        sortPivotColumnHeaders:false //we want months non sorted to get them in the right order.
+        sortPivotColumnHeaders:false
     });
 
     function dumpObj(obj, name, depth) {
