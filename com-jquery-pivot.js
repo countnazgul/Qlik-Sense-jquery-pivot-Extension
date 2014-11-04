@@ -18,8 +18,7 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
 			items : {
 				dimensions : {
 					uses : "dimensions",
-					min : 1,
-					max: 3
+					min : 1
 				},
 				measures : {
 					uses : "measures",
@@ -94,17 +93,24 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
       var c = 0;
       var columns = [];
       var rows = [];
-
-      for(c = 0; c < layout.qHyperCube.qDimensionInfo.length; c++) {
-        var column = layout.qHyperCube.qDimensionInfo[c];
-        column = { colvalue: column.qFallbackTitle.replace(' ', ''), coltext: column.qFallbackTitle.replace(' ', ''), header: column.qFallbackTitle.replace(' ', ''), sortbycol: column.qFallbackTitle.replace(' ', ''), result: false };
-        if( c === 0) {
-          column.pivot = true;
-          column.groupbyrank = null;
-        } else {
-          column.pivot = false;
-          column.groupbyrank = c;
+      
+      if( layout.qHyperCube.qDimensionInfo.length > 1) {
+        for(c = 0; c < layout.qHyperCube.qDimensionInfo.length; c++) {
+          var column = layout.qHyperCube.qDimensionInfo[c];
+          column = { colvalue: column.qFallbackTitle.replace(' ', ''), coltext: column.qFallbackTitle.replace(' ', ''), header: column.qFallbackTitle.replace(' ', ''), sortbycol: column.qFallbackTitle.replace(' ', ''), result: false };
+          if( c === 0) {
+            column.pivot = true;
+            column.groupbyrank = null;
+          } else {
+            column.pivot = false;
+            column.groupbyrank = c;
+          }
+          columns.push(column);
         }
+      } else {
+        columns.push({ colvalue: "Total1", coltext: "Total1", header: "Total1", sortbycol: "Total1", result: false, pivot: true, groupbyrank: null });
+        var column = layout.qHyperCube.qDimensionInfo[0];
+        column = { colvalue: column.qFallbackTitle.replace(' ', ''), coltext: column.qFallbackTitle.replace(' ', ''), header: column.qFallbackTitle.replace(' ', ''), sortbycol: column.qFallbackTitle.replace(' ', ''), result: false, groupbyrank : 1 };
         columns.push(column);
       }
       
@@ -121,8 +127,13 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
       for(d = 0; d < qMatrix.length; d++) {
           var row = qMatrix[d];
           var row1 = {};
-          for(var co = 0; co < columns.length; co++) {
-            row1[columns[co].coltext] = row[co].qText.replace(' ', '');
+          
+          if( layout.qHyperCube.qDimensionInfo.length > 1) {
+            for(var co = 0; co < columns.length; co++) {
+              row1[columns[co].coltext] = row[co].qText.replace(' ', '');
+            }
+          } else {
+            row1[columns[1].coltext] = row[0].qText.replace(' ', '');
           }
 
           row1[layout.qHyperCube.qMeasureInfo[0].qFallbackTitle] = row[row.length-1].qText;
@@ -135,7 +146,6 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
           rows: rows
       };
 
-      //var format = layout.format;
     $('#'+id).pivot({
         source: JSONdata,
         formatFunc: function (n) { return numeral(n).format(layout.format) }, //jQuery.fn.pivot.formatUK(n, parseInt(layout.decimals)); },
