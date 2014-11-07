@@ -84,19 +84,20 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
 			canTakeSnapshot : true
 		},
 		paint : function($element,layout) {
+		  var self = this;
 			var qMatrix = layout.qHyperCube.qDataPages[0].qMatrix;
-			//var colors = Highcharts.getOptions().colors;
 			var id = "div_" + layout.qInfo.qId;
 			$element.html( '<div id="' + id + '"></div>' );
-
+      var qDimensionInfo = layout.qHyperCube.qDimensionInfo;
       var d = 0;
       var c = 0;
       var columns = [];
       var rows = [];
-      
+
       if( layout.qHyperCube.qDimensionInfo.length > 1) {
         for(c = 0; c < layout.qHyperCube.qDimensionInfo.length; c++) {
           var column = layout.qHyperCube.qDimensionInfo[c];
+
           column = { colvalue: column.qFallbackTitle.replace(' ', ''), coltext: column.qFallbackTitle.replace(' ', ''), header: column.qFallbackTitle.replace(' ', ''), sortbycol: column.qFallbackTitle.replace(' ', ''), result: false };
           if( c === 0) {
             column.pivot = true;
@@ -113,7 +114,7 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
         column = { colvalue: column.qFallbackTitle.replace(' ', ''), coltext: column.qFallbackTitle.replace(' ', ''), header: column.qFallbackTitle.replace(' ', ''), sortbycol: column.qFallbackTitle.replace(' ', ''), result: false, groupbyrank : 1 };
         columns.push(column);
       }
-      
+
       var lastMeasure = {};
       lastMeasure.colvalue = layout.qHyperCube.qMeasureInfo[0].qFallbackTitle.replace(' ', '');
       lastMeasure.coltext = layout.qHyperCube.qMeasureInfo[0].qFallbackTitle.replace(' ', '');
@@ -123,14 +124,24 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
       lastMeasure.pivot = false;
       lastMeasure.groupbyrank = null;
       columns.push(lastMeasure);
-      
+
+      var t = [];
+      for(var co1 = 0; co1 < columns.length; co1++) {
+        t[columns[co1].coltext] = [];
+      };
+
+      //console.log(t);
+
       for(d = 0; d < qMatrix.length; d++) {
           var row = qMatrix[d];
           var row1 = {};
-          
+
           if( layout.qHyperCube.qDimensionInfo.length > 1) {
             for(var co = 0; co < columns.length; co++) {
               row1[columns[co].coltext] = row[co].qText.replace(' ', '');
+              //console.log(row[co]);
+              t[columns[co].coltext].push({value: row[co].qText.replace(' ', ''), elem : row[co].qElemNumber});
+
             }
           } else {
             row1[columns[1].coltext] = row[0].qText.replace(' ', '');
@@ -146,16 +157,62 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
           rows: rows
       };
 
+     //console.log(qDimensionInfo);
+
     $('#'+id).pivot({
         source: JSONdata,
         formatFunc: function (n) { return numeral(n).format(layout.format) }, //jQuery.fn.pivot.formatUK(n, parseInt(layout.decimals)); },
-        bTotals: layout.showtotals,              // Option
-        bCollapsible: layout.collapsible,         // Option
+        bTotals: layout.showtotals,
+        bCollapsible: layout.collapsible,
         noGroupByText: "No value",  // Option
         noDataText: "No data",      // Option
         onResultCellClicked: function (data) {
+
           var a = '{' + dumpObj(data, "data") + '}';
-          console.log(JSON.parse(a));
+          a = JSON.parse(a);
+          //console.log(a);
+          //console.log(t);
+
+          for(var g = 0; g < Object.keys(a.data.groups).length; g++) {
+            var pivotField = a.data.groups[g].dataidGroup;
+            var d = t[pivotField];
+            var pivotValue = a.data.groups[g].groupbyval;
+            //console.log(d);
+
+            for(var o = 0; o < d.length; o++) {
+
+              if(d[o].value === pivotValue) {
+                var dim = [];
+                dim.push(d[o].elem)
+
+
+                for(var qdi = 0; qdi < qDimensionInfo.length; qdi++) {
+                  var title = qDimensionInfo[qdi].qFallbackTitle.replace(' ', '');
+                  if(title == pivotField) {
+                    //console.log(qdi + ' ' + dim);
+                    self.backendApi.selectValues(qdi, dim, false);
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+          }
+
+          var pivotField = a.data.pivot.dataidPivot;
+          var d = t[pivotField];
+          var pivotValue = a.data.pivot.pivotvalue;
+
+          for(var o = 0; o < d.length; o++) {
+            //console.log(d[o].value + '===' + pivotValue + ' ' + d[o].elem )
+            if(d[o].value === pivotValue) {
+              var dim = [];
+              dim.push(d[o].elem)
+
+              self.backendApi.selectValues(0, [d[o].elem], false);
+              break;
+            }
+          }
         },
         sortPivotColumnHeaders:false
     });
@@ -196,6 +253,4 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
         }
     }
 }};
-
-
 });
