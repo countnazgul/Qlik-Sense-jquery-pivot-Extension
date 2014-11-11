@@ -8,7 +8,7 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
 				qMeasures : [],
 				qInitialDataFetch : [{
 					qWidth : 10,
-					qHeight : 50
+					qHeight : 500
 				}]
 			}
 		},
@@ -85,9 +85,54 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
 		},
 		paint : function($element,layout) {
 		  var self = this;
-			var qMatrix = layout.qHyperCube.qDataPages[0].qMatrix;
+		  //console.log(self.backendApi.getRowCount());
+		  var lastrow = 0;
+		  var qMatrix = [];
+     self.backendApi.eachDataRow( function ( rownum, row ) {
+                lastrow = rownum;
+                qMatrix.push(row);
+                //console.log(rownum);
+                //do something with the row..
+     });
+
+    if(this.backendApi.getRowCount() > lastrow +1){
+               //we havent got all the rows yet, so get some more, 1000 rows
+                var requestPage = [{
+                      qTop: lastrow + 1,
+                      qLeft: 0,
+                      qWidth: 10, //should be # of columns
+                      qHeight: Math.min( 1000, this.backendApi.getRowCount() - lastrow )
+                  }];
+                 self.backendApi.getData( requestPage ).then( function ( dataPages ) {
+                          //when we get the result trigger paint again
+                          //me.paint( $element );
+                          //console.log(dataPages);
+                          //console.log(qMatrix.length);
+                          //console.log(dataPages[0].qMatrix.length);
+                          qMatrix = qMatrix.concat(dataPages[0].qMatrix);
+                          //console.log(qMatrix.length);
+                 } );
+       }
+
+
+var requestPage = [{
+                      qTop: 1,
+                      qLeft: 0,
+                      qWidth: 10, //should be # of columns
+                      qHeight: Math.min( 1000, this.backendApi.getRowCount() - lastrow )
+                  }];
+
+       //self.backendApi.GetHyperCubePivotData('/qHyperCubeDef', requestPage).then(function(pages) {
+
+       //});
+       console.log(layout.qHyperCube);
+
+
+     //console.log(qMatrix.length + ' ' + self.backendApi.getRowCount())
+
+			var qMatrix1 = layout.qHyperCube.qDataPages[0].qMatrix;
 			var id = "div_" + layout.qInfo.qId;
-			$element.html( '<div id="' + id + '"></div>' );
+			$element.html( '<div id="' + id + '"></div><div> <input type="button" id="test" value="test"></input> </div>' );
       var qDimensionInfo = layout.qHyperCube.qDimensionInfo;
       var d = 0;
       var c = 0;
@@ -138,9 +183,13 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
 
           if( layout.qHyperCube.qDimensionInfo.length > 1) {
             for(var co = 0; co < columns.length; co++) {
-              row1[columns[co].coltext] = row[co].qText.replace(' ', '');
-              //console.log(row[co]);
-              t[columns[co].coltext].push({value: row[co].qText.replace(' ', ''), elem : row[co].qElemNumber});
+               if(row[co].qText)               {
+                row1[columns[co].coltext] = row[co].qText.replace(' ', '');
+                t[columns[co].coltext].push({value: row[co].qText.replace(' ', ''), elem : row[co].qElemNumber});
+               } else {
+                 row1[columns[co].coltext] = '99';
+                 t[columns[co].coltext].push({value: '99', elem : row[co].qElemNumber});
+               }
 
             }
           } else {
@@ -158,6 +207,10 @@ define(["jquery","text!./stylesheet.css", "./jquery.pivot.min", "./numeral"], fu
       };
 
      //console.log(qDimensionInfo);
+
+    $('#test').click(function() {
+      console.log('test');
+    });
 
     $('#'+id).pivot({
         source: JSONdata,
